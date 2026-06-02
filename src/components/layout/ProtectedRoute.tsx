@@ -3,8 +3,6 @@ import { useConvexAuth } from "convex/react";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 
-// ── ProtectedRoute ────────────────────────────────────────────────────────────
-
 interface ProtectedRouteProps {
   children?: React.ReactNode;
 }
@@ -25,8 +23,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   return children ? <>{children}</> : <Outlet />;
 }
 
-// ── RoleRoute ─────────────────────────────────────────────────────────────────
-
 interface RoleRouteProps {
   role: "importer" | "wholesaler" | "admin";
 }
@@ -45,7 +41,6 @@ export function RoleRoute({ role }: RoleRouteProps) {
   if (!user) return <Navigate to="/onboarding" replace />;
 
   if (user.role !== role) {
-    // Redirect to their correct dashboard
     const home =
       user.role === "importer"
         ? "/importer"

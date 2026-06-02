@@ -2,21 +2,20 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getCallerUser, generateAlias } from "./lib";
 
-/** Get the current user's profile */
 export const me = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
+    const email = identity.email ?? "";
     return await ctx.db
       .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", email))
       .unique();
   },
 });
 
-/** Complete onboarding — called once after sign-up */
 export const completeOnboarding = mutation({
   args: {
     role:        v.union(v.literal("importer"), v.literal("wholesaler")),
@@ -28,27 +27,26 @@ export const completeOnboarding = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    // Ensure user doesn't already exist
+    const email = identity.email ?? "";
+
     const existing = await ctx.db
       .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", email))
       .unique();
 
     if (existing) throw new Error("Profile already exists");
 
     const userId = await ctx.db.insert("users", {
-      clerkId:     identity.subject,
-      email:       identity.email ?? "",
+      email,
       role:        args.role,
       displayName: args.displayName,
-      alias:       "", // will be set below with the real ID
+      alias:       "",
       phone:       args.phone,
       city:        args.city,
       verified:    false,
       createdAt:   Date.now(),
     });
 
-    // Now update alias using the generated ID
     const alias = generateAlias(args.role, userId);
     await ctx.db.patch(userId, { alias });
 
@@ -56,7 +54,6 @@ export const completeOnboarding = mutation({
   },
 });
 
-/** Update profile (non-sensitive fields only) */
 export const updateProfile = mutation({
   args: {
     displayName: v.optional(v.string()),
@@ -70,19 +67,11 @@ export const updateProfile = mutation({
   },
 });
 
-/** Admin: list all users with full data */
 export const listAllUsers = query({
   args: { role: v.optional(v.string()) },
   handler: async (ctx, { role }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const caller = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!caller || caller.role !== "admin") throw new Error("Admin access required");
+    const caller = await getCallerUser(ctx);
+    if (caller.role !== "admin") throw new Error("Admin access required");
 
     const users = role
       ? await ctx.db
@@ -95,7 +84,6 @@ export const listAllUsers = query({
   },
 });
 
-/** Get notification list for current user */
 export const myNotifications = query({
   args: {},
   handler: async (ctx) => {
@@ -108,7 +96,6 @@ export const myNotifications = query({
   },
 });
 
-/** Mark notification as read */
 export const markNotificationRead = mutation({
   args: { notificationId: v.id("notifications") },
   handler: async (ctx, { notificationId }) => {

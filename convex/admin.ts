@@ -83,3 +83,36 @@ export const verifyUser = mutation({
     await ctx.db.patch(userId, { verified: true });
   },
 });
+
+/** Admin: seed the first admin user */
+export const seedAdmin = mutation({
+  args: { secretKey: v.string() },
+  handler: async (ctx, { secretKey }) => {
+    const expectedKey = process.env.ADMIN_SEED_KEY;
+    if (!expectedKey || secretKey !== expectedKey) {
+      throw new Error("Invalid admin seed key");
+    }
+
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_role", (q) => q.eq("role", "admin"))
+      .first();
+
+    if (existing) throw new Error("Admin already exists");
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const email = identity.email ?? "";
+    const userId = await ctx.db.insert("users", {
+      email,
+      role: "admin",
+      displayName: "System Admin",
+      alias: "Admin",
+      verified: true,
+      createdAt: Date.now(),
+    });
+
+    return userId;
+  },
+});

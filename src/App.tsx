@@ -1,7 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useConvexAuth } from "convex/react";
-import { useQuery } from "convex/react";
-import { api } from "@convex/_generated/api";
 
 // Layouts
 import RootLayout from "@/components/layout/RootLayout";
@@ -57,7 +55,7 @@ export default function App() {
 
   return (
     <Routes>
-      {/* ── Public ── */}
+      {/* Public */}
       <Route element={<RootLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/sign-in" element={<SignInPage />} />
@@ -65,13 +63,13 @@ export default function App() {
         <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       </Route>
 
-      {/* ── Marketplace (authenticated, any role) ── */}
+      {/* Marketplace (authenticated, any role) */}
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/marketplace/:productId" element={<ProductDetailPage />} />
         <Route path="/chat/:dealId?" element={<ChatPage />} />
 
-        {/* ── Importer routes ── */}
+        {/* Importer routes */}
         <Route path="/importer" element={<RoleRoute role="importer" />}>
           <Route index element={<ImporterDashboard />} />
           <Route path="listings" element={<ImporterListings />} />
@@ -80,7 +78,7 @@ export default function App() {
           <Route path="earnings" element={<ImporterEarnings />} />
         </Route>
 
-        {/* ── Wholesaler routes ── */}
+        {/* Wholesaler routes */}
         <Route path="/wholesaler" element={<RoleRoute role="wholesaler" />}>
           <Route index element={<WholesalerDashboard />} />
           <Route path="orders" element={<WholesalerOrders />} />
@@ -88,7 +86,7 @@ export default function App() {
           <Route path="checkout" element={<WholesalerCheckout />} />
         </Route>
 
-        {/* ── Admin routes (full data visibility) ── */}
+        {/* Admin routes (full data visibility) */}
         <Route path="/admin" element={<RoleRoute role="admin" />}>
           <Route index element={<AdminDashboard />} />
           <Route path="deals" element={<AdminDeals />} />
@@ -97,7 +95,7 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* ── Fallback ── */}
+      {/* Fallback */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
