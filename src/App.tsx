@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useConvexAuth } from "convex/react";
 import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 
 // Layouts
 import RootLayout from "@/components/layout/RootLayout";
@@ -42,7 +42,7 @@ import NotFoundPage from "@/pages/NotFoundPage";
 
 // Guards
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
-import RoleRoute from "@/components/layout/RoleRoute";
+import { RoleRoute } from "@/components/layout/ProtectedRoute";
 
 export default function App() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -50,7 +50,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

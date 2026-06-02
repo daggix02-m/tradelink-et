@@ -1,10 +1,11 @@
 import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { useGsapReveal } from "@/hooks/useGsapReveal";
 import { useEffect, useRef } from "react";
 import { countUp } from "@/animations/gsap";
 import { Package, TrendingUp, MessageSquare, ClipboardList, Plus, ArrowRight } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 export default function ImporterDashboard() {
   const user = useQuery(api.users.me);
@@ -34,16 +35,16 @@ export default function ImporterDashboard() {
       valueRef: activeListingsRef,
       value: listings?.filter((l: any) => l.isActive).length ?? 0,
       icon: Package,
-      color: "text-brand-600",
-      bg: "bg-brand-50",
+      color: "text-primary",
+      bg: "bg-primary/10",
     },
     {
       label: "Active Deals",
       valueRef: activeDealsRef,
       value: deals?.length ?? 0,
       icon: MessageSquare,
-      color: "text-gold-600",
-      bg: "bg-gold-50",
+      color: "text-secondary-foreground",
+      bg: "bg-secondary",
     },
   ];
 
@@ -62,7 +63,7 @@ export default function ImporterDashboard() {
       {/* Stat cards */}
       <div className="gsap-reveal grid grid-cols-2 gap-4">
         {stats.map(({ label, valueRef, value, icon: Icon, color, bg }) => (
-          <div key={label} className="card p-5">
+          <div key={label} className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-neutral-500">{label}</span>
               <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}>
@@ -83,8 +84,8 @@ export default function ImporterDashboard() {
       <div className="gsap-reveal">
         <h2 className="text-sm font-semibold text-neutral-700 mb-3">Quick actions</h2>
         <div className="grid grid-cols-2 gap-3">
-          <NavLink to="/importer/listings/new" className="card-hover p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center">
+          <NavLink to="/importer/listings/new" className="bg-card border border-border rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5 p-4 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
               <Plus size={18} className="text-white" />
             </div>
             <div>
@@ -93,9 +94,9 @@ export default function ImporterDashboard() {
             </div>
             <ArrowRight size={16} className="ml-auto text-neutral-300" />
           </NavLink>
-          <NavLink to="/importer/orders" className="card-hover p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gold-100 flex items-center justify-center">
-              <ClipboardList size={18} className="text-gold-700" />
+          <NavLink to="/importer/orders" className="bg-card border border-border rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5 p-4 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
+              <ClipboardList size={18} className="text-secondary-foreground" />
             </div>
             <div>
               <p className="text-sm font-medium text-neutral-900">View orders</p>
@@ -107,30 +108,30 @@ export default function ImporterDashboard() {
       </div>
 
       {/* Recent deals */}
-      <div className="gsap-reveal card overflow-hidden">
+      <div className="gsap-reveal bg-card border border-border rounded-xl overflow-hidden">
         <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
           <h2 className="font-semibold text-neutral-900 text-sm">Recent deal activity</h2>
-          <NavLink to="/chat" className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1">
+          <NavLink to="/chat" className="text-xs text-primary hover:text-primary flex items-center gap-1">
             View all <ArrowRight size={12} />
           </NavLink>
         </div>
         {deals?.slice(0, 5).map((deal: any) => (
           <div key={deal._id} className="flex items-center gap-3 px-4 py-3 border-b border-neutral-50 hover:bg-neutral-50 transition-colors">
-            <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
-              <Package size={14} className="text-brand-600" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Package size={14} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-neutral-900 truncate">{deal.productTitle}</p>
               <p className="text-xs text-neutral-500">{deal.counterpartAlias} · {deal.quantity} units</p>
             </div>
-            <span className={`badge ${deal.status === "negotiating" ? "badge-gold" : "badge-green"}`}>
+            <Badge variant={deal.status === "negotiating" ? "outline" : "secondary"}>
               {deal.status}
-            </span>
+            </Badge>
           </div>
         ))}
         {!deals?.length && (
           <div className="py-10 text-center text-neutral-400 text-sm">
-            No deals yet — <NavLink to="/importer/listings/new" className="text-brand-600">add your first listing</NavLink>
+            No deals yet — <NavLink to="/importer/listings/new" className="text-primary">add your first listing</NavLink>
           </div>
         )}
       </div>

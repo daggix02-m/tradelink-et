@@ -1,9 +1,10 @@
 import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { useGsapReveal } from "@/hooks/useGsapReveal";
 import { useEffect, useRef } from "react";
 import { countUp } from "@/animations/gsap";
 import { DollarSign, TrendingUp, ShoppingBag, Percent } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminRevenue() {
   const summary = useQuery(api.admin.revenueSummary, {});
@@ -29,15 +30,15 @@ export default function AdminRevenue() {
       label: "Total GMV",
       ref: gmvRef,
       icon: ShoppingBag,
-      bg: "bg-brand-50",
-      color: "text-brand-600",
+      bg: "bg-primary/10",
+      color: "text-primary",
     },
     {
       label: "Commission Earned",
       ref: commRef,
       icon: DollarSign,
-      bg: "bg-gold-50",
-      color: "text-gold-600",
+      bg: "bg-secondary",
+      color: "text-secondary-foreground",
     },
     {
       label: "Supplier Payouts",
@@ -60,7 +61,7 @@ export default function AdminRevenue() {
       {/* KPI cards */}
       <div className="gsap-reveal grid grid-cols-3 gap-4">
         {stats.map(({ label, ref: statRef, icon: Icon, bg, color }) => (
-          <div key={label} className="card p-5">
+          <div key={label} className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs text-neutral-500">{label}</span>
               <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
@@ -76,7 +77,7 @@ export default function AdminRevenue() {
 
       {/* Avg commission rate */}
       {summary && (
-        <div className="gsap-reveal card p-5 flex items-center gap-4">
+        <div className="gsap-reveal bg-card border border-border rounded-xl p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center">
             <Percent size={22} className="text-amber-600" />
           </div>
@@ -93,7 +94,7 @@ export default function AdminRevenue() {
       )}
 
       {/* Commission rules */}
-      <div className="gsap-reveal card overflow-hidden">
+      <div className="gsap-reveal bg-card border border-border rounded-xl overflow-hidden">
         <div className="p-4 border-b border-neutral-100">
           <h2 className="font-semibold text-neutral-900 text-sm">Commission rules</h2>
           <p className="text-xs text-neutral-500 mt-0.5">Applied silently to all transactions</p>
@@ -115,9 +116,9 @@ export default function AdminRevenue() {
                 <td className="px-4 py-3 text-neutral-500">{r.flatFeeEtb ?? "—"}</td>
                 <td className="px-4 py-3">
                   {r.isDefault ? (
-                    <span className="badge badge-green">Default</span>
+                    <Badge variant="secondary">Default</Badge>
                   ) : (
-                    <span className="badge badge-gray">Category</span>
+                    <Badge variant="outline">Category</Badge>
                   )}
                 </td>
               </tr>

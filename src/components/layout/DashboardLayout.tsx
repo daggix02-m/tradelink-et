@@ -1,14 +1,15 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useQuery } from "convex/react";
-import { useClerk } from "@clerk/clerk-react";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import {
   LayoutDashboard, Package, ShoppingCart, MessageSquare,
   TrendingUp, Users, Settings, LogOut, Bell, ChevronRight,
   Store, DollarSign, ClipboardList
 } from "lucide-react";
 import { useGsapReveal } from "@/hooks/useGsapReveal";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const importerNav = [
   { to: "/importer",          icon: LayoutDashboard, label: "Dashboard",  end: true },
@@ -38,7 +39,6 @@ const adminNav = [
 export default function DashboardLayout() {
   const user = useQuery(api.users.me);
   const unread = useQuery(api.messages.unreadCount);
-  const { signOut } = useClerk();
   const navigate = useNavigate();
   const sidebarRef = useGsapReveal({ delay: 0.1 });
 
@@ -56,48 +56,47 @@ export default function DashboardLayout() {
       ? "Supplier"
       : "Wholesaler";
 
-  const roleColor =
+  const roleVariant =
     user?.role === "admin"
-      ? "badge-red"
+      ? "destructive"
       : user?.role === "importer"
-      ? "badge-green"
-      : "badge-gold";
+      ? "default"
+      : "secondary";
 
-  const handleSignOut = async () => {
-    await signOut();
+  const handleSignOut = () => {
     navigate("/");
   };
 
   return (
-    <div className="flex h-screen bg-neutral-50">
+    <div className="flex h-screen bg-background">
       {/* ── Sidebar ── */}
       <aside
         ref={sidebarRef}
-        className="w-64 bg-white border-r border-neutral-200 flex flex-col h-full"
+        className="w-64 bg-card border-r border-border flex flex-col h-full"
       >
         {/* Logo */}
-        <div className="gsap-reveal px-6 py-5 border-b border-neutral-100">
+        <div className="gsap-reveal px-6 py-5 border-b border-border">
           <NavLink to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm font-display">T</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">T</span>
             </div>
-            <span className="font-display font-semibold text-neutral-900">
-              TradeLink<span className="text-brand-600"> ET</span>
+            <span className="font-semibold text-foreground">
+              TradeLink<span className="text-primary"> ET</span>
             </span>
           </NavLink>
         </div>
 
         {/* User info */}
-        <div className="gsap-reveal px-4 py-4 border-b border-neutral-100">
+        <div className="gsap-reveal px-4 py-4 border-b border-border">
           <div className="flex items-center gap-3 px-2">
-            <div className="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-semibold text-sm">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
               {user?.displayName?.[0] ?? "?"}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-neutral-900 truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {user?.displayName ?? "Loading…"}
               </p>
-              <span className={clsx("badge text-xs", roleColor)}>{roleLabel}</span>
+              <Badge variant={roleVariant} className="text-xs">{roleLabel}</Badge>
             </div>
           </div>
         </div>
@@ -110,18 +109,18 @@ export default function DashboardLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                clsx(
+                cn(
                   "gsap-reveal flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
                   isActive
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )
               }
             >
               <Icon size={17} />
               <span className="flex-1">{label}</span>
               {label === "Messages" && (unread ?? 0) > 0 && (
-                <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                   {unread}
                 </span>
               )}
@@ -130,44 +129,45 @@ export default function DashboardLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="gsap-reveal px-3 py-4 border-t border-neutral-100 space-y-0.5">
+        <div className="gsap-reveal px-3 py-4 border-t border-border space-y-0.5">
           <NavLink
             to="/settings"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-neutral-600 hover:bg-neutral-50 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-muted transition-all"
           >
             <Settings size={17} />
             Settings
           </NavLink>
-          <button
+          <Button
+            variant="ghost"
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-neutral-600 hover:bg-red-50 hover:text-red-600 transition-all"
+            className="w-full justify-start gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-600 hover:bg-red-50 hover:text-red-600"
           >
             <LogOut size={17} />
             Sign out
-          </button>
+          </Button>
         </div>
       </aside>
 
       {/* ── Main content ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Topbar */}
-        <header className="h-14 border-b border-neutral-200 bg-white px-6 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2 text-sm text-neutral-500">
+        <header className="h-14 border-b border-border bg-card px-6 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>TradeLink ET</span>
             <ChevronRight size={14} />
-            <span className="text-neutral-900 font-medium">{roleLabel} Portal</span>
+            <span className="text-foreground font-medium">{roleLabel} Portal</span>
           </div>
           <div className="flex items-center gap-3">
             <NavLink
               to="/chat"
-              className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+              className="relative p-2 rounded-lg hover:bg-muted transition-colors"
             >
-              <Bell size={18} className="text-neutral-600" />
+              <Bell size={18} className="text-muted-foreground" />
               {(unread ?? 0) > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-brand-600 rounded-full" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
               )}
             </NavLink>
-            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold">
               {user?.displayName?.[0] ?? "?"}
             </div>
           </div>
