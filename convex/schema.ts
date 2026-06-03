@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   users: defineTable({
     email:         v.string(),
+    password:      v.optional(v.string()),
     role:          v.union(v.literal("importer"), v.literal("wholesaler"), v.literal("admin")),
     alias:         v.string(),
     displayName:   v.string(),
@@ -147,4 +148,8 @@ export default defineSchema({
   })
     .index("by_reviewee", ["revieweeId"])
     .index("by_order", ["orderId"]),
+
+  mockSession: defineTable({
+    email: v.string(),
+  }),
 });

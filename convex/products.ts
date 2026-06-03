@@ -97,13 +97,10 @@ export const getProduct = query({
     const product = await ctx.db.get(productId);
     if (!product || !product.isActive) return null;
 
-    const { displayPrice, commissionAmount } = await applyCommission(
-      ctx,
-      product.rawPrice,
-      product.category
-    );
-
-    const supplier = await ctx.db.get(product.supplierId);
+    const [{ displayPrice, commissionAmount }, supplier] = await Promise.all([
+      applyCommission(ctx, product.rawPrice, product.category),
+      ctx.db.get(product.supplierId),
+    ]);
 
     if (caller.role === "wholesaler") {
       const { rawPrice: _hidden, ...safeProduct } = product;

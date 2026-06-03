@@ -6,9 +6,17 @@ export const me = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    let email = identity?.email ?? "";
 
-    const email = identity.email ?? "";
+    if (!email) {
+      const session = await ctx.db.query("mockSession").first();
+      if (session) {
+        email = session.email;
+      }
+    }
+
+    if (!email) return null;
+
     return await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", email))
@@ -103,5 +111,97 @@ export const markNotificationRead = mutation({
     const notif = await ctx.db.get(notificationId);
     if (notif?.userId !== caller._id) throw new Error("Access denied");
     await ctx.db.patch(notificationId, { read: true });
+  },
+});
+
+export const verifyAdmin = mutation({
+  args: { email: v.string(), password: v.string() },
+  handler: async (ctx, { email, password }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+    if (!user) return { success: false, message: "Invalid email or password" };
+    if (user.role !== "admin") return { success: false, message: "Access denied" };
+    if (user.password !== password) return { success: false, message: "Invalid email or password" };
+    return { success: true, user };
+  },
+});
+
+export const seedAdminUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const email = "daggi.x02@gmail.com";
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        role: "admin",
+        password: "Daggi@524",
+        displayName: "System Admin",
+        verified: true,
+      });
+      return existing._id;
+    }
+
+    const userId = await ctx.db.insert("users", {
+      email,
+      password: "Daggi@524",
+      role: "admin",
+      displayName: "System Admin",
+      alias: "Admin-System",
+      verified: true,
+      createdAt: Date.now(),
+    });
+    return userId;
+  },
+});
+
+export const setMockSession = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    const sessions = await ctx.db.query("mockSession").collect();
+    for (const session of sessions) {
+      await ctx.db.delete(session._id);
+    }
+    await ctx.db.insert("mockSession", { email });
+
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+
+    if (!existing) {
+      let role: "importer" | "wholesaler" | "admin" = "importer";
+      if (email.includes("admin")) {
+        role = "admin";
+      } else if (email.includes("wholesaler") || email.includes("buyer")) {
+        role = "wholesaler";
+      }
+
+      const displayName = role === "admin" 
+        ? "System Admin" 
+        : role === "importer" 
+        ? "Mock Importer" 
+        : "Mock Wholesaler";
+
+      const alias = role === "admin"
+        ? "Admin"
+        : role === "importer"
+        ? "Supplier-Mock"
+        : "Buyer-Mock";
+
+      await ctx.db.insert("users", {
+        email,
+        role,
+        displayName,
+        alias,
+        verified: true,
+        createdAt: Date.now(),
+      });
+    }
   },
 });

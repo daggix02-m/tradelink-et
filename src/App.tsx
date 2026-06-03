@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { useConvexAuth } from "convex/react";
+import { useMockAuth } from "@/hooks/useMockAuth";
 
 // Layouts
 import RootLayout from "@/components/layout/RootLayout";
@@ -7,9 +7,9 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 
 // Public pages
 import LandingPage from "@/pages/LandingPage";
-import SignInPage from "@/pages/SignInPage";
-import SignUpPage from "@/pages/SignUpPage";
-import OnboardingPage from "@/pages/OnboardingPage";
+import PortalSelectPage from "@/pages/PortalSelectPage";
+import ImporterAuthPage from "@/pages/importer/AuthPage";
+import WholesalerAuthPage from "@/pages/wholesaler/AuthPage";
 
 // Shared / Marketplace
 import MarketplacePage from "@/pages/marketplace/MarketplacePage";
@@ -33,6 +33,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminDeals from "@/pages/admin/Deals";
 import AdminRevenue from "@/pages/admin/Revenue";
 import AdminUsers from "@/pages/admin/Users";
+import AdminAuthPage from "@/pages/admin/AuthPage";
 
 // Shared
 import ChatPage from "@/pages/ChatPage";
@@ -43,7 +44,7 @@ import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import { RoleRoute } from "@/components/layout/ProtectedRoute";
 
 export default function App() {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isLoading } = useMockAuth();
 
   if (isLoading) {
     return (
@@ -58,9 +59,18 @@ export default function App() {
       {/* Public */}
       <Route element={<RootLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+        <Route path="/portal-select" element={<PortalSelectPage />} />
+        
+        {/* Importer Auth */}
+        <Route path="/importer/login" element={<ImporterAuthPage mode="login" />} />
+        <Route path="/importer/register" element={<ImporterAuthPage mode="register" />} />
+        
+        {/* Wholesaler Auth */}
+        <Route path="/wholesaler/login" element={<WholesalerAuthPage mode="login" />} />
+        <Route path="/wholesaler/register" element={<WholesalerAuthPage mode="register" />} />
+
+        {/* Admin Auth */}
+        <Route path="/admin/login" element={<AdminAuthPage />} />
       </Route>
 
       {/* Marketplace (authenticated, any role) */}

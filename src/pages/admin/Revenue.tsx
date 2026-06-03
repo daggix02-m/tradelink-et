@@ -44,16 +44,18 @@ export default function AdminRevenue() {
       label: "Supplier Payouts",
       ref: payoutRef,
       icon: TrendingUp,
-      bg: "bg-neutral-100",
-      color: "text-neutral-600",
+      bg: "bg-card",
+      color: "text-foreground",
     },
   ];
 
   return (
     <div ref={ref} className="max-w-4xl space-y-6">
       <div className="gsap-reveal">
-        <h1 className="text-2xl font-display font-semibold text-neutral-900">Revenue</h1>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h1 className="text-2xl font-display font-semibold text-foreground">
+          Revenue
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Full financial visibility — commission details are invisible to suppliers and buyers
         </p>
       </div>
@@ -63,12 +65,12 @@ export default function AdminRevenue() {
         {stats.map(({ label, ref: statRef, icon: Icon, bg, color }) => (
           <div key={label} className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-neutral-500">{label}</span>
+              <span className="text-xs text-muted-foreground">{label}</span>
               <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
                 <Icon size={16} className={color} />
               </div>
             </div>
-            <span ref={statRef} className="text-2xl font-display font-semibold text-neutral-900">
+            <span ref={statRef} className="text-2xl font-display font-semibold text-foreground">
               ETB 0
             </span>
           </div>
@@ -82,11 +84,11 @@ export default function AdminRevenue() {
             <Percent size={22} className="text-amber-600" />
           </div>
           <div>
-            <p className="text-sm text-neutral-500">Effective commission rate</p>
-            <p className="text-xl font-display font-semibold text-neutral-900">
+            <p className="text-sm text-muted-foreground">Effective commission rate</p>
+            <p className="text-xl font-display font-semibold text-foreground">
               {summary.avgCommissionRate.toFixed(1)}%
             </p>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-muted-foreground">
               Across {summary.totalOrders} orders · {summary.deliveredOrders} delivered
             </p>
           </div>
@@ -95,25 +97,27 @@ export default function AdminRevenue() {
 
       {/* Commission rules */}
       <div className="gsap-reveal bg-card border border-border rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-neutral-100">
-          <h2 className="font-semibold text-neutral-900 text-sm">Commission rules</h2>
-          <p className="text-xs text-neutral-500 mt-0.5">Applied silently to all transactions</p>
+        <div className="p-4 border-b border-border">
+          <h2 className="font-semibold text-foreground text-sm">Commission rules</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Applied silently to all transactions
+          </p>
         </div>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-neutral-100 bg-neutral-50">
-              <th className="px-4 py-2.5 text-left text-xs text-neutral-500 font-medium">Category</th>
-              <th className="px-4 py-2.5 text-left text-xs text-neutral-500 font-medium">Rate %</th>
-              <th className="px-4 py-2.5 text-left text-xs text-neutral-500 font-medium">Flat fee (ETB)</th>
-              <th className="px-4 py-2.5 text-left text-xs text-neutral-500 font-medium">Type</th>
+            <tr className="border-b border-border bg-muted">
+              <th className="px-4 py-2.5 text-left text-xs text-muted-foreground font-medium">Category</th>
+              <th className="px-4 py-2.5 text-left text-xs text-muted-foreground font-medium">Rate %</th>
+              <th className="px-4 py-2.5 text-left text-xs text-muted-foreground font-medium">Flat fee (ETB)</th>
+              <th className="px-4 py-2.5 text-left text-xs text-muted-foreground font-medium">Type</th>
             </tr>
           </thead>
           <tbody>
             {rules?.map((r: any) => (
-              <tr key={r._id} className="border-b border-neutral-50 hover:bg-neutral-50">
-                <td className="px-4 py-3 text-neutral-900">{r.category ?? "All categories"}</td>
-                <td className="px-4 py-3 text-neutral-900">{r.ratePercent}%</td>
-                <td className="px-4 py-3 text-neutral-500">{r.flatFeeEtb ?? "—"}</td>
+              <tr key={r._id} className="border-b border-muted hover:bg-muted">
+                <td className="px-4 py-3 text-foreground">{r.category ?? "All categories"}</td>
+                <td className="px-4 py-3 text-foreground">{r.ratePercent}%</td>
+                <td className="px-4 py-3 text-muted-foreground">{r.flatFeeEtb ?? "—"}</td>
                 <td className="px-4 py-3">
                   {r.isDefault ? (
                     <Badge variant="secondary">Default</Badge>

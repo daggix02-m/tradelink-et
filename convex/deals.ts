@@ -212,7 +212,7 @@ export const makeOffer = mutation({
     } else {
       // Buyer is counter-offering the displayPrice they see — reverse-calculate rawPrice
       displayPrice = pricePerUnit;
-      const { displayPrice: dp, commissionAmount: ca } = await applyCommission(
+      const { commissionAmount: ca } = await applyCommission(
         ctx, pricePerUnit, product.category
       );
       // Reverse: rawPrice = displayPrice / (1 + rate)

@@ -27,7 +27,7 @@ export default function ChatPage() {
     api.messages.listMessages,
     dealId ? { dealId: dealId as Id<"deals"> } : "skip"
   );
-  const user = useQuery(api.users.me);
+  // unused user var removed
   const myDeals = useQuery(api.deals.myDeals, {});
 
   const sendMessage = useMutation(api.messages.sendMessage);
@@ -91,7 +91,7 @@ export default function ChatPage() {
                 <p className="text-xs font-medium text-foreground truncate">
                   {d.productTitle ?? "Product"}
                 </p>
-                <p className="text-xs text-muted-foreground">{d.counterpartAlias}</p>
+                <p className="text-xs text-muted-foreground">{(d as any).counterpartAlias || (d as any).supplierAlias || "Partner"}</p>
                 <Badge
                   variant="outline"
                   className={cn(
@@ -122,7 +122,7 @@ export default function ChatPage() {
                 {deal.productTitle}
               </h3>
               <p className="text-xs text-muted-foreground">
-                with {deal.counterpartAlias} · {deal.quantity} units
+                with {(deal as any).counterpartAlias || (deal as any).supplierAlias || "Partner"} · {deal.quantity} units
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -147,13 +147,13 @@ export default function ChatPage() {
           </div>
 
           {/* Price info (masked by role) */}
-          {deal.agreedPrice && (
+          {((deal as any).agreedPrice || (deal as any).agreedDisplayPrice) && (
             <div className="px-4 py-2 bg-muted border-b border-border flex items-center gap-2">
               <DollarSign size={14} className="text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
                 Current agreed price:{" "}
                 <strong className="text-foreground">
-                  ETB {deal.agreedPrice?.toLocaleString("en-ET")} / unit
+                  ETB {((deal as any).agreedPrice || (deal as any).agreedDisplayPrice)?.toLocaleString("en-ET")} / unit
                 </strong>
               </span>
             </div>

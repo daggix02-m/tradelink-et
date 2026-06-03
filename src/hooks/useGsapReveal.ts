@@ -1,22 +1,30 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "./useReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * Attach a GSAP stagger reveal to all `.gsap-reveal` children
- * inside the returned ref. Safe with React StrictMode.
- */
-export function useGsapReveal(options?: {
+export function useGsapReveal<T extends HTMLElement = HTMLDivElement>(options?: {
   delay?: number;
   stagger?: number;
   scroll?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<T>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!ref.current) return;
+
+    if (prefersReducedMotion) {
+      const targets = ref.current.querySelectorAll(".gsap-reveal");
+      targets.forEach((el) => {
+        (el as HTMLElement).style.opacity = "1";
+        (el as HTMLElement).style.transform = "none";
+      });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const targets = ref.current!.querySelectorAll(".gsap-reveal");
       if (!targets.length) return;
@@ -28,8 +36,8 @@ export function useGsapReveal(options?: {
           {
             opacity: 1,
             y: 0,
-            duration: 0.55,
-            ease: "power2.out",
+            duration: 0.6,
+            ease: "power3.out",
             stagger: options.stagger ?? 0.09,
             delay: options.delay ?? 0,
             scrollTrigger: {
@@ -46,8 +54,8 @@ export function useGsapReveal(options?: {
           {
             opacity: 1,
             y: 0,
-            duration: 0.5,
-            ease: "power2.out",
+            duration: 0.6,
+            ease: "power3.out",
             stagger: options?.stagger ?? 0.08,
             delay: options?.delay ?? 0,
           }
@@ -56,20 +64,27 @@ export function useGsapReveal(options?: {
     }, ref);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return ref;
 }
 
-/** Hook for a single element entrance animation */
 export function useGsapEntrance(
   animation: "fadeUp" | "slideLeft" | "slideRight" | "scaleIn" = "fadeUp",
   delay = 0
 ) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!ref.current) return;
+
+    if (prefersReducedMotion) {
+      (ref.current as HTMLElement).style.opacity = "1";
+      (ref.current as HTMLElement).style.transform = "none";
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const from: gsap.TweenVars = { opacity: 0 };
       if (animation === "fadeUp") from.y = 24;
@@ -82,14 +97,14 @@ export function useGsapEntrance(
         y: 0,
         x: 0,
         scale: 1,
-        duration: 0.5,
-        ease: animation === "scaleIn" ? "back.out(1.4)" : "power2.out",
+        duration: 0.6,
+        ease: animation === "scaleIn" ? "back.out(1.4)" : "power3.out",
         delay,
       });
     }, ref);
 
     return () => ctx.revert();
-  }, []);
+  }, [animation, delay, prefersReducedMotion]);
 
   return ref;
 }

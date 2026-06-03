@@ -1,14 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useConvexAuth } from "convex/react";
-import { useQuery } from "convex/react";
-import { api } from "@convex/_generated/api";
+import { useMockAuth } from "@/hooks/useMockAuth";
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useMockAuth();
 
   if (isLoading) {
     return (
@@ -28,23 +26,16 @@ interface RoleRouteProps {
 }
 
 export function RoleRoute({ role }: RoleRouteProps) {
-  const user = useQuery(api.users.me);
+  const currentRole = useMockAuth((s) => s.role);
+  const isAuthenticated = useMockAuth((s) => s.isAuthenticated);
 
-  if (user === undefined) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (!isAuthenticated) return <Navigate to="/onboarding" replace />;
 
-  if (!user) return <Navigate to="/onboarding" replace />;
-
-  if (user.role !== role) {
+  if (currentRole !== role) {
     const home =
-      user.role === "importer"
+      currentRole === "importer"
         ? "/importer"
-        : user.role === "wholesaler"
+        : currentRole === "wholesaler"
         ? "/wholesaler"
         : "/admin";
     return <Navigate to={home} replace />;
